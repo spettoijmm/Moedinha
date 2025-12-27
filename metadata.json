@@ -1,0 +1,5 @@
+{
+  "name": "Moedinha | Gerenciador Financeiro Pessoal",
+  "description": "A Material 3 inspired personal finance application to track income and expenses. Features real-time local data persistence and AI-powered financial insights using Gemini.",
+  "requestFramePermissions": []
+}
