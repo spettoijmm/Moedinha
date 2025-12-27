@@ -1,13 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 import { Transaction } from "../types";
 
+// Always initialize the client with the API key from process.env.API_KEY.
+// According to guidelines, we should assume the API key is pre-configured and accessible.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getFinancialAdvice = async (transactions: Transaction[], context?: string): Promise<string> => {
-  if (!process.env.API_KEY) {
-    return "Chave de API ausente. Configure a variável de ambiente API_KEY para usar a IA.";
-  }
-
   try {
     // Limit data size to save tokens but prioritize recent/relevant ones
     const relevantTransactions = transactions.slice(0, 80).map(t => ({
@@ -41,11 +39,13 @@ export const getFinancialAdvice = async (transactions: Transaction[], context?: 
         `;
     }
 
+    // Always use ai.models.generateContent to query GenAI with both the model name and prompt.
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: basePrompt + specificInstruction,
     });
 
+    // The simplest way to get the generated text is by accessing the .text property (not a method).
     return response.text || "Não foi possível gerar a análise no momento.";
   } catch (error) {
     console.error("Gemini API Error:", error);

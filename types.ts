@@ -27,6 +27,7 @@ export interface Account {
   type: 'wallet' | 'bank' | 'investment' | 'other';
   balance: number;
   color: string;
+  iconName?: string; // Nome do ícone para persistência
 }
 
 export interface Budget {
