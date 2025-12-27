@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis } from 'recharts';
-import { Transaction } from '../types';
+import { Transaction, Budget } from '../types';
 import { transactionService } from '../services/transactionService';
 import SummaryCards from './SummaryCards';
 import TransactionList from './TransactionList';
-import { Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { Sparkles, Loader2, ArrowRight, AlertTriangle } from 'lucide-react';
 import { getFinancialAdvice } from '../services/geminiService';
 
 const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [aiAdvice, setAiAdvice] = useState<string>('');
   const [loadingAdvice, setLoadingAdvice] = useState(false);
+  const [budgetAlerts, setBudgetAlerts] = useState<{ budget: Budget; spent: number }[]>([]);
 
   useEffect(() => {
-    setTransactions(transactionService.getTransactions());
-    const unsubscribe = transactionService.subscribe(() => {
-      setTransactions(transactionService.getTransactions());
-    });
+    const loadData = () => {
+        setTransactions(transactionService.getTransactions());
+        setBudgetAlerts(transactionService.getBudgetAlerts());
+    };
+    loadData();
+    const unsubscribe = transactionService.subscribe(loadData);
     return () => unsubscribe();
   }, []);
 
@@ -44,7 +47,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="p-4 md:p-6 pb-24 max-w-4xl mx-auto">
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Moedinha</h1>
           <p className="text-gray-500 text-sm">Olá, {transactionService.getUser()?.username}</p>
@@ -58,6 +61,21 @@ const Dashboard: React.FC = () => {
           IA Insights
         </button>
       </header>
+      
+      {/* Alerta de Orçamento Excedido */}
+      {budgetAlerts.length > 0 && (
+        <div className="bg-red-50 border border-red-100 p-4 rounded-[20px] mb-6 flex items-start gap-3 shadow-sm animate-scale-in">
+             <div className="bg-red-100 text-red-600 p-2 rounded-full shrink-0">
+                 <AlertTriangle className="w-5 h-5" />
+             </div>
+             <div>
+                 <h3 className="text-red-800 font-bold text-sm">Atenção! Limites Excedidos</h3>
+                 <p className="text-red-600 text-xs mt-1 leading-relaxed">
+                     Você ultrapassou o orçamento em <strong>{budgetAlerts.length}</strong> plano(s): {budgetAlerts.map(b => b.budget.name).join(', ')}.
+                 </p>
+             </div>
+        </div>
+      )}
 
       {aiAdvice && (
         <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 border border-violet-100 p-6 rounded-[24px] mb-8 animate-fade-in text-gray-800">

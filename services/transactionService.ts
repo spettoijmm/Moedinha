@@ -293,6 +293,24 @@ class TransactionService {
       localStorage.setItem(STORAGE_KEY_BUDGETS, JSON.stringify(updated));
       this.notifyListeners();
   }
+
+  getBudgetAlerts(): { budget: Budget; spent: number }[] {
+    const budgets = this.getBudgets();
+    const transactions = this.getTransactions();
+    const now = new Date();
+    
+    return budgets.map(b => {
+        const spent = transactions
+        .filter(t => 
+            b.categoryIds.includes(t.category) && 
+            t.type === 'expense' &&
+            new Date(t.date).getMonth() === now.getMonth() &&
+            new Date(t.date).getFullYear() === now.getFullYear()
+        )
+        .reduce((sum, t) => sum + t.amount, 0);
+        return { budget: b, spent };
+    }).filter(item => item.spent > item.budget.limit);
+  }
 }
 
 export const transactionService = new TransactionService();

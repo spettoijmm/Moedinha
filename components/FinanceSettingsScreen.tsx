@@ -4,7 +4,7 @@ import {
   ArrowLeft, Coffee, ShoppingBag, Car, Home, Zap, HeartPulse, 
   GraduationCap, DollarSign, Briefcase, ArrowRightLeft, ChartPie,
   Star, Trash2, X, ChevronRight, CreditCard, PiggyBank, Landmark,
-  Coins
+  Coins, Check
 } from 'lucide-react';
 import { Account, CategoryItem, Transaction } from '../types';
 import { transactionService } from '../services/transactionService';
@@ -34,6 +34,20 @@ const ACCOUNT_AVAILABLE_ICONS = [
   { id: 'briefcase', label: 'Trabalho' },
 ];
 
+// Cores disponíveis para contas (Hex)
+const ACCOUNT_COLORS = [
+  '#6366f1', // Indigo (Padrão)
+  '#10b981', // Emerald
+  '#ef4444', // Red
+  '#f59e0b', // Amber
+  '#3b82f6', // Blue
+  '#8b5cf6', // Violet
+  '#ec4899', // Pink
+  '#14b8a6', // Teal
+  '#64748b', // Slate
+  '#0ea5e9', // Sky
+];
+
 const FinanceSettingsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'accounts' | 'categories'>('accounts');
   const [subTab, setSubTab] = useState<string>('wallet');
@@ -46,6 +60,9 @@ const FinanceSettingsScreen: React.FC = () => {
   // Estados de navegação interna (Drill-down)
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<CategoryItem | null>(null);
+  
+  // Estado para filtro no detalhe da conta
+  const [detailFilter, setDetailFilter] = useState<'all' | 'income' | 'expense'>('all');
 
   // Estados de Modais
   const [isAddingAccount, setIsAddingAccount] = useState(false);
@@ -55,6 +72,7 @@ const FinanceSettingsScreen: React.FC = () => {
   const [newName, setNewName] = useState('');
   const [newType, setNewType] = useState('wallet');
   const [newIcon, setNewIcon] = useState('wallet');
+  const [newColor, setNewColor] = useState('#6366f1');
 
   useEffect(() => {
     const fetchData = () => {
@@ -76,18 +94,26 @@ const FinanceSettingsScreen: React.FC = () => {
     }
   }, [activeTab]);
 
+  // Reseta o filtro ao selecionar uma nova conta
+  useEffect(() => {
+    if (selectedAccount) {
+        setDetailFilter('all');
+    }
+  }, [selectedAccount]);
+
   const handleAddAccount = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName) return;
     transactionService.addAccount({
         name: newName,
         type: newType as any,
-        color: '#6366f1',
+        color: newColor,
         iconName: newIcon
     });
     setIsAddingAccount(false);
     setNewName('');
     setNewIcon('wallet');
+    setNewColor('#6366f1');
   };
 
   const handleAddCategory = (e: React.FormEvent) => {
@@ -115,6 +141,7 @@ const FinanceSettingsScreen: React.FC = () => {
   if (selectedAccount) {
     const accountTransactions = transactions
         .filter(t => t.accountId === selectedAccount.id)
+        .filter(t => detailFilter === 'all' ? true : t.type === detailFilter)
         .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return (
@@ -129,12 +156,15 @@ const FinanceSettingsScreen: React.FC = () => {
               </div>
             </header>
 
-            <div className="bg-indigo-600 text-white p-8 rounded-[32px] shadow-xl mb-8 text-center relative overflow-hidden group">
+            <div 
+              className="text-white p-8 rounded-[32px] shadow-xl mb-6 text-center relative overflow-hidden group transition-all duration-300"
+              style={{ backgroundColor: selectedAccount.color }}
+            >
                 <div className="relative z-10">
-                    <p className="text-indigo-100 text-xs font-bold uppercase tracking-[0.15em] mb-2 opacity-80">Saldo disponível</p>
+                    <p className="text-white/80 text-xs font-bold uppercase tracking-[0.15em] mb-2">Saldo disponível</p>
                     <h2 className="text-4xl font-extrabold tracking-tight">R$ {selectedAccount.balance.toFixed(2)}</h2>
                 </div>
-                <div className="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                <div className="absolute -right-6 -bottom-6 opacity-20 group-hover:scale-110 transition-transform duration-700">
                     {(() => {
                         const IconComp = (selectedAccount.iconName && ICON_MAP[selectedAccount.iconName]) || Wallet;
                         return <IconComp className="w-40 h-40" />
@@ -142,8 +172,32 @@ const FinanceSettingsScreen: React.FC = () => {
                 </div>
             </div>
 
+            {/* Filtros de Visualização */}
+            <div className="flex bg-gray-200 p-1 rounded-xl mb-6 shrink-0 shadow-inner">
+                <button 
+                    onClick={() => setDetailFilter('all')} 
+                    className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${detailFilter === 'all' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    Tudo
+                </button>
+                <button 
+                    onClick={() => setDetailFilter('income')} 
+                    className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${detailFilter === 'income' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    Entradas
+                </button>
+                <button 
+                    onClick={() => setDetailFilter('expense')} 
+                    className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${detailFilter === 'expense' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    Saídas
+                </button>
+            </div>
+
             <div className="flex items-center justify-between mb-4 px-1">
-                <h3 className="font-bold text-gray-800">Últimas movimentações</h3>
+                <h3 className="font-bold text-gray-800">
+                    {detailFilter === 'all' ? 'Últimas movimentações' : detailFilter === 'income' ? 'Entradas Recentes' : 'Saídas Recentes'}
+                </h3>
                 <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-md uppercase">{accountTransactions.length} registros</span>
             </div>
             
@@ -248,7 +302,11 @@ const FinanceSettingsScreen: React.FC = () => {
                     className="w-full bg-white p-5 rounded-[24px] border border-gray-100 flex items-center justify-between group hover:border-indigo-200 hover:shadow-lg transition-all"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-100 transition-colors">
+                      {/* Ícone dinâmico com cor e opacidade */}
+                      <div 
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center transition-colors group-hover:scale-105"
+                        style={{ backgroundColor: `${acc.color}1A`, color: acc.color }}
+                      >
                         <TypeIcon className="w-6 h-6" />
                       </div>
                       <div className="text-left">
@@ -270,6 +328,7 @@ const FinanceSettingsScreen: React.FC = () => {
                 onClick={() => {
                   setIsAddingAccount(true);
                   setNewIcon(subTab); // Inicia com o ícone padrão da aba
+                  setNewColor('#6366f1');
                 }}
                 className="w-full mt-2 py-6 border-2 border-dashed border-gray-200 rounded-[24px] text-gray-400 font-bold text-sm flex items-center justify-center gap-2 hover:border-indigo-300 hover:text-indigo-500 hover:bg-white transition-all"
               >
@@ -373,6 +432,24 @@ const FinanceSettingsScreen: React.FC = () => {
                           className={`flex items-center gap-3 p-4 rounded-2xl border text-xs font-bold transition-all ${newType === type.id ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-slate-100 text-gray-500'}`}
                         >
                            <type.icon className={`w-4 h-4 ${newType === type.id ? 'text-white' : 'text-indigo-400'}`} /> {type.label}
+                        </button>
+                      ))}
+                   </div>
+                </div>
+
+                {/* Seção de Seleção de Cor */}
+                <div>
+                   <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Cor de Identificação</label>
+                   <div className="flex flex-wrap gap-3 bg-slate-50 p-4 rounded-[24px] border border-slate-100 justify-center">
+                      {ACCOUNT_COLORS.map(color => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => setNewColor(color)}
+                          className={`w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center ${newColor === color ? 'border-gray-400 scale-110 shadow-sm' : 'border-transparent hover:scale-110'}`}
+                          style={{ backgroundColor: color }}
+                        >
+                          {newColor === color && <Check className="w-4 h-4 text-white drop-shadow-md" />}
                         </button>
                       ))}
                    </div>

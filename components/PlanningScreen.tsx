@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, AlertCircle, Plus, Lock, Unlock, Trash2 } from 'lucide-react';
+import { Target, AlertCircle, Plus, Lock, Unlock, Trash2, AlertTriangle } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { Budget, Transaction } from '../types';
 import { transactionService } from '../services/transactionService';
@@ -145,48 +145,59 @@ const PlanningScreen: React.FC = () => {
               const isOverBudget = spent > budget.limit;
 
               return (
-                  <div key={budget.id} className="bg-white p-5 rounded-[20px] shadow-sm border border-gray-100 relative group">
-                      <div className="flex justify-between items-start mb-3">
+                  <div 
+                    key={budget.id} 
+                    className={`p-5 rounded-[24px] shadow-sm border transition-all relative group overflow-hidden ${isOverBudget ? 'bg-red-50 border-red-200 ring-2 ring-red-100' : 'bg-white border-gray-100'}`}
+                  >
+                      {isOverBudget && (
+                        <div className="absolute right-0 top-0 p-4 opacity-10 pointer-events-none">
+                            <AlertTriangle className="w-24 h-24 text-red-500" />
+                        </div>
+                      )}
+
+                      <div className="flex justify-between items-start mb-3 relative z-10">
                           <div className="flex items-center gap-3">
-                              <div className={`p-2 rounded-lg bg-indigo-50 text-indigo-600`}>
+                              <div className={`p-2 rounded-xl ${isOverBudget ? 'bg-red-100 text-red-600' : 'bg-indigo-50 text-indigo-600'}`}>
                                   <Target className="w-5 h-5" />
                               </div>
                               <div>
-                                  <h3 className="font-bold text-gray-800">{budget.name}</h3>
-                                  <p className="text-[10px] text-gray-400 leading-tight max-w-[150px] truncate">
+                                  <h3 className={`font-bold ${isOverBudget ? 'text-red-900' : 'text-gray-800'}`}>{budget.name}</h3>
+                                  <p className={`text-[10px] leading-tight max-w-[150px] truncate font-medium ${isOverBudget ? 'text-red-400' : 'text-gray-400'}`}>
                                       {budget.categoryIds.length} categorias
                                   </p>
                               </div>
                           </div>
                           <div className="flex items-center gap-2">
-                              <button onClick={() => toggleLock(budget)} className="text-gray-300 hover:text-gray-600 p-1">
+                              <button onClick={() => toggleLock(budget)} className={`${isOverBudget ? 'text-red-300 hover:text-red-600' : 'text-gray-300 hover:text-gray-600'} p-1 transition-colors`}>
                                   {budget.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
                               </button>
                               {!budget.isLocked && (
-                                <button onClick={() => handleDeleteBudget(budget.id)} className="text-gray-300 hover:text-red-500 p-1">
+                                <button onClick={() => handleDeleteBudget(budget.id)} className={`${isOverBudget ? 'text-red-300 hover:text-red-600' : 'text-gray-300 hover:text-red-500'} p-1 transition-colors`}>
                                     <Trash2 className="w-4 h-4" />
                                 </button>
                               )}
                           </div>
                       </div>
 
-                      <div className="space-y-1">
-                          <div className="flex justify-between text-xs text-gray-500 mb-1">
-                              <span className={isOverBudget ? 'text-red-500 font-bold' : ''}>
-                                  R$ {spent.toFixed(0)} <span className="font-normal text-gray-400">/ {budget.limit}</span>
+                      <div className="space-y-2 relative z-10">
+                          <div className="flex justify-between text-xs font-medium mb-1">
+                              <span className={isOverBudget ? 'text-red-600 font-bold' : 'text-gray-500'}>
+                                  R$ {spent.toFixed(0)} <span className={`font-normal ${isOverBudget ? 'text-red-400' : 'text-gray-400'}`}>/ {budget.limit}</span>
                               </span>
-                              <span>{percentage.toFixed(0)}%</span>
+                              <span className={isOverBudget ? 'text-red-600 font-bold' : 'text-gray-500'}>{percentage.toFixed(0)}%</span>
                           </div>
-                          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                          
+                          <div className={`h-3 w-full rounded-full overflow-hidden ${isOverBudget ? 'bg-red-200' : 'bg-gray-100'}`}>
                               <div 
-                                className={`h-full rounded-full transition-all duration-500 ${isOverBudget ? 'bg-red-500' : 'bg-indigo-500'}`} 
+                                className={`h-full rounded-full transition-all duration-500 ${isOverBudget ? 'bg-red-500 animate-pulse' : 'bg-indigo-500'}`} 
                                 style={{ width: `${Math.min(percentage, 100)}%` }}
                               />
                           </div>
+
                           {isOverBudget && (
-                              <div className="flex items-center gap-1 text-xs text-red-500 mt-1 font-medium">
-                                  <AlertCircle className="w-3 h-3" />
-                                  <span>Limite excedido!</span>
+                              <div className="flex items-center gap-2 text-xs text-red-600 mt-2 font-bold bg-red-100/50 p-2 rounded-lg">
+                                  <AlertCircle className="w-4 h-4" />
+                                  <span>Limite mensal excedido!</span>
                               </div>
                           )}
                       </div>
