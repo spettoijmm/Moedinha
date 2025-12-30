@@ -39,10 +39,8 @@ const AccountsScreen: React.FC = () => {
     setNewAccName('');
   };
 
-  // Logic for Detailed View
   if (selectedAccount) {
       const currentAccountData = accounts.find(a => a.id === selectedAccount.id) || selectedAccount;
-      
       const accountTransactions = transactions
         .filter(t => t.accountId === selectedAccount.id)
         .filter(t => detailFilter === 'all' ? true : t.type === detailFilter)
@@ -78,7 +76,6 @@ const AccountsScreen: React.FC = () => {
       );
   }
 
-  // Main List View
   return (
     <div className="p-6 pb-24">
       <header className="mb-8 flex justify-between items-center">
@@ -86,10 +83,7 @@ const AccountsScreen: React.FC = () => {
            <h1 className="text-2xl font-bold text-gray-900">Minhas Contas</h1>
            <p className="text-gray-500 text-sm">Gerencie carteiras e bancos</p>
         </div>
-        <button 
-            onClick={() => setIsAdding(!isAdding)}
-            className="w-10 h-10 bg-indigo-600 rounded-full text-white flex items-center justify-center shadow-lg hover:bg-indigo-700 transition-colors"
-        >
+        <button onClick={() => setIsAdding(!isAdding)} className="w-10 h-10 bg-indigo-600 rounded-full text-white flex items-center justify-center shadow-lg hover:bg-indigo-700 transition-colors">
             <Plus className="w-6 h-6" />
         </button>
       </header>
@@ -100,26 +94,23 @@ const AccountsScreen: React.FC = () => {
               <div className="space-y-3">
                   <input 
                     type="text" 
-                    placeholder="Nome da Conta (Ex: Nubank)" 
+                    placeholder="Nome da Conta" 
                     className="w-full p-3 bg-gray-50 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
                     value={newAccName}
                     onChange={e => setNewAccName(e.target.value)}
                   />
                   <div className="flex gap-2 overflow-x-auto pb-2">
-                      {ACCOUNT_TYPES.map(type => {
-                          const Icon = type.icon;
-                          return (
-                            <button
-                                key={type.id}
-                                type="button"
-                                onClick={() => setNewAccType(type.id)}
-                                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm whitespace-nowrap border ${newAccType === type.id ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-100 text-gray-600'}`}
-                            >
-                                <Icon className="w-4 h-4" />
-                                {type.label}
-                            </button>
-                          )
-                      })}
+                      {ACCOUNT_TYPES.map(type => (
+                          <button
+                              key={type.id}
+                              type="button"
+                              onClick={() => setNewAccType(type.id)}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm whitespace-nowrap border ${newAccType === type.id ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-100 text-gray-600'}`}
+                          >
+                              <type.icon className="w-4 h-4" />
+                              {type.label}
+                          </button>
+                      ))}
                   </div>
                   <button type="submit" className="w-full py-3 bg-indigo-600 text-white rounded-xl font-medium">Salvar</button>
               </div>
@@ -129,25 +120,22 @@ const AccountsScreen: React.FC = () => {
       <div className="space-y-4">
         {accounts.map(acc => {
             const typeInfo = ACCOUNT_TYPES.find(t => t.id === acc.type) || ACCOUNT_TYPES[0];
-            const TypeIcon = typeInfo.icon;
-
             return (
                 <button 
                     key={acc.id} 
                     onClick={() => setSelectedAccount(acc)}
-                    className="w-full bg-white p-5 rounded-[24px] shadow-sm border border-gray-100 flex justify-between items-center group relative overflow-hidden hover:scale-[1.02] transition-transform text-left"
+                    className="w-full bg-white p-5 rounded-[24px] shadow-sm border border-gray-100 flex justify-between items-center group hover:scale-[1.02] transition-transform text-left"
                 >
-                    <div className="relative z-10 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
-                             <TypeIcon className="w-6 h-6" />
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-600">
+                             <typeInfo.icon className="w-6 h-6" />
                         </div>
                         <div>
                             <h3 className="font-bold text-gray-900">{acc.name}</h3>
                             <p className="text-xs text-gray-500 uppercase tracking-wider">{typeInfo.label}</p>
                         </div>
                     </div>
-                    <div className="relative z-10 text-right">
-                        <p className="text-xs text-gray-400 mb-1">Saldo Atual</p>
+                    <div className="text-right">
                         <p className={`text-lg font-bold ${acc.balance >= 0 ? 'text-gray-900' : 'text-red-500'}`}>
                              R$ {acc.balance.toFixed(2)}
                         </p>

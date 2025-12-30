@@ -55,17 +55,15 @@ class TransactionService {
       try {
           const data = JSON.parse(jsonString);
           if (!data.user || !data.transactions) return false;
-
           localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(data.transactions));
           localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(data.accounts));
           localStorage.setItem(STORAGE_KEY_BUDGETS, JSON.stringify(data.budgets));
           localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(data.categories));
           localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(data.user));
-          
           this.notifyListeners();
           return true;
       } catch (e) {
-          console.error("Sync Error", e);
+          console.error(e);
           return false;
       }
   }
@@ -78,11 +76,8 @@ class TransactionService {
   registerUser(username: string, pin: string): void {
     const user: UserProfile = { username, pin, avatar: '👤', biometricsEnabled: true };
     localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
-    
     if (!localStorage.getItem(STORAGE_KEY_ACCOUNTS)) {
-         const initialAccounts: Account[] = [
-            { id: 'acc1', name: 'Carteira', type: 'wallet', balance: 0, color: '#6366f1' },
-         ];
+         const initialAccounts: Account[] = [{ id: 'acc1', name: 'Carteira', type: 'wallet', balance: 0, color: '#6366f1' }];
          localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(initialAccounts));
          localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify([]));
     }
@@ -92,8 +87,7 @@ class TransactionService {
   updateUser(updates: Partial<UserProfile>): void {
       const current = this.getUser();
       if (current) {
-          const updated = { ...current, ...updates };
-          localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updated));
+          localStorage.setItem(STORAGE_KEY_USER, JSON.stringify({ ...current, ...updates }));
           this.notifyListeners();
       }
   }
@@ -112,18 +106,13 @@ class TransactionService {
 
   addCategory(category: Omit<CategoryItem, 'id'>): void {
       const current = this.getCategories();
-      const newCat: CategoryItem = {
-          ...category,
-          id: `custom_${crypto.randomUUID()}`,
-          isCustom: true
-      };
+      const newCat: CategoryItem = { ...category, id: `custom_${crypto.randomUUID()}`, isCustom: true };
       localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify([...current, newCat]));
       this.notifyListeners();
   }
 
   deleteCategory(id: string): void {
-      const current = this.getCategories();
-      const updated = current.filter(c => c.id !== id);
+      const updated = this.getCategories().filter(c => c.id !== id);
       localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(updated));
       this.notifyListeners();
   }
@@ -133,23 +122,13 @@ class TransactionService {
     return raw ? JSON.parse(raw) : [];
   }
 
-  addTransaction(
-    transaction: Omit<Transaction, 'id'>, 
-    recurrenceSettings?: { 
-        frequency: RecurrenceFrequency, 
-        isInfinite: boolean, 
-        count?: number 
-    }
-  ): void {
+  addTransaction(transaction: Omit<Transaction, 'id'>, recurrenceSettings?: { frequency: RecurrenceFrequency, isInfinite: boolean, count?: number }): void {
     const current = this.getTransactions();
     const newTransactions: Transaction[] = [];
     const parentId = crypto.randomUUID();
 
     if (!recurrenceSettings) {
-        newTransactions.push({
-            ...transaction,
-            id: crypto.randomUUID(),
-        });
+        newTransactions.push({ ...transaction, id: crypto.randomUUID() });
     } else {
         const { frequency, isInfinite, count } = recurrenceSettings;
         const iterations = isInfinite ? 24 : (count || 1); 
@@ -162,9 +141,7 @@ class TransactionService {
             if (frequency === 'monthly') date.setMonth(baseDate.getMonth() + i);
             else if (frequency === 'yearly') date.setFullYear(baseDate.getFullYear() + i);
             else if (frequency === 'semiannual') date.setMonth(baseDate.getMonth() + (i * 6));
-            else {
-                date.setDate(baseDate.getDate() + (i * freqInfo.days));
-            }
+            else date.setDate(baseDate.getDate() + (i * freqInfo.days));
 
             newTransactions.push({
                 ...transaction,
@@ -172,50 +149,27 @@ class TransactionService {
                 amount: amountPerTx,
                 date: date.toISOString(),
                 title: isInfinite ? transaction.title : `${transaction.title} (${i + 1}/${iterations})`,
-                recurrence: {
-                    frequency,
-                    isInfinite,
-                    current: i + 1,
-                    total: isInfinite ? undefined : iterations,
-                    parentId
-                }
+                recurrence: { frequency, isInfinite, current: i + 1, total: isInfinite ? undefined : iterations, parentId }
             });
         }
     }
-    
-    const updated = [...newTransactions, ...current];
-    localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(updated));
+    localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify([...newTransactions, ...current]));
     this.notifyListeners();
   }
 
   addTransfer(fromAccountId: string, toAccountId: string, amount: number, date: string, title: string) {
       const current = this.getTransactions();
-      const tOut: Transaction = {
-        id: crypto.randomUUID(),
-        title: `Envio: ${title}`,
-        amount: amount,
-        date: date,
-        type: 'expense',
-        category: 'transfer',
-        accountId: fromAccountId
-      };
-      const tIn: Transaction = {
-        id: crypto.randomUUID(),
-        title: `Recebimento: ${title}`,
-        amount: amount,
-        date: date,
-        type: 'income',
-        category: 'transfer',
-        accountId: toAccountId
-      };
-      const updated = [tOut, tIn, ...current];
+      const updated = [
+          { id: crypto.randomUUID(), title: `Envio: ${title}`, amount, date, type: 'expense' as const, category: 'transfer', accountId: fromAccountId },
+          { id: crypto.randomUUID(), title: `Recebimento: ${title}`, amount, date, type: 'income' as const, category: 'transfer', accountId: toAccountId },
+          ...current
+      ];
       localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(updated));
       this.notifyListeners();
   }
 
   deleteTransaction(id: string): void {
-    const current = this.getTransactions();
-    const updated = current.filter(t => t.id !== id);
+    const updated = this.getTransactions().filter(t => t.id !== id);
     localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(updated));
     this.notifyListeners();
   }
@@ -224,7 +178,6 @@ class TransactionService {
     const raw = localStorage.getItem(STORAGE_KEY_ACCOUNTS);
     const accounts: Account[] = raw ? JSON.parse(raw) : [];
     const transactions = this.getTransactions();
-    
     return accounts.map(acc => {
       const accTransactions = transactions.filter(t => t.accountId === acc.id);
       const balance = accTransactions.reduce((sum, t) => {
@@ -239,8 +192,7 @@ class TransactionService {
   addAccount(account: Omit<Account, 'id' | 'balance'>): void {
     const raw = localStorage.getItem(STORAGE_KEY_ACCOUNTS);
     const current: Account[] = raw ? JSON.parse(raw) : [];
-    const newAccount: Account = { ...account, id: crypto.randomUUID(), balance: 0 };
-    localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify([...current, newAccount]));
+    localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify([...current, { ...account, id: crypto.randomUUID(), balance: 0 }]));
     this.notifyListeners();
   }
 
@@ -264,8 +216,7 @@ class TransactionService {
   }
 
   deleteBudget(id: string): void {
-      const current = this.getBudgets();
-      const updated = current.filter(b => b.id !== id);
+      const updated = this.getBudgets().filter(b => b.id !== id);
       localStorage.setItem(STORAGE_KEY_BUDGETS, JSON.stringify(updated));
       this.notifyListeners();
   }
@@ -274,15 +225,9 @@ class TransactionService {
     const budgets = this.getBudgets();
     const transactions = this.getTransactions();
     const now = new Date();
-    
     return budgets.map(b => {
         const spent = transactions
-        .filter(t => 
-            b.categoryIds.includes(t.category) && 
-            t.type === 'expense' &&
-            new Date(t.date).getMonth() === now.getMonth() &&
-            new Date(t.date).getFullYear() === now.getFullYear()
-        )
+        .filter(t => b.categoryIds.includes(t.category) && t.type === 'expense' && new Date(t.date).getMonth() === now.getMonth() && new Date(t.date).getFullYear() === now.getFullYear())
         .reduce((sum, t) => sum + t.amount, 0);
         return { budget: b, spent };
     }).filter(item => item.spent > item.budget.limit);

@@ -92,33 +92,28 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Floating Action Button - Mobile & Desktop */}
+      {/* Floating Action Button */}
       {currentScreen !== 'profile' && currentScreen !== 'sync' && (
         <button
           onClick={() => setIsFormOpen(true)}
           className="fixed right-6 bottom-24 md:bottom-8 w-16 h-16 bg-indigo-600 rounded-full text-white shadow-2xl shadow-indigo-300 flex items-center justify-center hover:bg-indigo-700 hover:scale-110 active:scale-95 transition-all z-40 group"
-          style={{ bottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)' }} 
         >
           <Plus className="w-8 h-8 group-hover:rotate-90 transition-transform" />
         </button>
       )}
 
       {/* Bottom Navigation for Mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-100 flex items-center justify-around px-2 py-2 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
-           style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
-      >
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-100 flex items-center justify-around px-2 py-2 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)]">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setCurrentScreen(item.id)}
             className={`flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all active:scale-95 ${
-              currentScreen === item.id ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-600'
+              currentScreen === item.id ? 'text-indigo-600' : 'text-gray-400'
             }`}
           >
-            <div className={`p-1 rounded-full transition-all ${currentScreen === item.id ? 'bg-indigo-100 scale-110' : ''}`}>
-              <item.icon className={`w-6 h-6 ${currentScreen === item.id ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-            </div>
-            <span className={`text-[10px] font-bold tracking-tight ${currentScreen === item.id ? 'opacity-100' : 'opacity-70'}`}>
+            <item.icon className={`w-6 h-6 ${currentScreen === item.id ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+            <span className="text-[10px] font-bold tracking-tight">
               {item.label}
             </span>
           </button>

@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "main": "electron/main.js",
-  "homepage": ".",
+  "homepage": ".", 
   "description": "Gerenciador Financeiro Pessoal com IA",
   "author": "Moedinha Team",
   "scripts": {
@@ -17,28 +17,28 @@
     "streamlit": "streamlit run streamlit_app.py"
   },
   "dependencies": {
-    "@google/genai": "^0.11.0",
-    "clsx": "^2.1.0",
-    "lucide-react": "^0.344.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-qr-code": "^2.0.12",
+    "lucide-react": "^0.344.0",
     "recharts": "^2.12.2",
+    "@google/genai": "^0.1.0",
+    "react-qr-code": "^2.0.12",
+    "clsx": "^2.1.0",
     "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@vitejs/plugin-react": "^4.2.1",
-    "concurrently": "^8.2.2",
-    "electron": "^39.2.7",
-    "electron-builder": "^24.13.3",
-    "gh-pages": "^6.1.1",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.0",
-    "vite-plugin-pwa": "^1.2.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.6",
+    "vite-plugin-pwa": "^0.19.2",
     "vite-plugin-singlefile": "^2.0.1",
-    "wait-on": "^7.2.0"
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0",
+    "gh-pages": "^6.1.1"
   },
   "build": {
     "appId": "com.moedinha.app",
