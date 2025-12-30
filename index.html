@@ -2,12 +2,14 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Moedinha | Financeiro</title>
     <meta name="theme-color" content="#ffffff">
     <meta name="description" content="Gerenciador Financeiro Pessoal com IA">
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="apple-touch-icon" href="/pwa-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <!-- Tailwind via CDN is kept for simplicity in this specific setup, 
          cached via Service Worker configured in vite.config.ts -->
@@ -17,6 +19,8 @@
       body {
         font-family: 'Roboto', sans-serif;
         background-color: #f8fafc;
+        /* Safe area support for iPhone X+ */
+        padding-bottom: env(safe-area-inset-bottom);
       }
     </style>
   <script type="importmap">

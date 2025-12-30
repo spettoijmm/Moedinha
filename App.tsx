@@ -40,8 +40,8 @@ const App: React.FC = () => {
 
   const navItems = [
     { id: 'dashboard' as const, label: 'Início', icon: Home },
-    { id: 'financeSettings' as const, label: 'Contas', icon: Wallet },
     { id: 'transactions' as const, label: 'Extrato', icon: ListPlus },
+    { id: 'financeSettings' as const, label: 'Contas', icon: Wallet }, // Funciona como 'Configurações de Conta'
     { id: 'planning' as const, label: 'Planos', icon: PieChart },
     { id: 'profile' as const, label: 'Perfil', icon: UserIcon },
   ];
@@ -86,35 +86,38 @@ const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative h-screen bg-slate-50">
-        <div className="max-w-4xl mx-auto pb-24 md:pb-6">
+        <div className="max-w-4xl mx-auto pb-28 md:pb-6">
           {renderScreen()}
         </div>
       </main>
 
-      {/* Floating Action Button - Only on appropriate screens */}
+      {/* Floating Action Button - Mobile & Desktop */}
       {currentScreen !== 'profile' && currentScreen !== 'sync' && (
         <button
           onClick={() => setIsFormOpen(true)}
-          className="fixed right-6 bottom-24 md:bottom-8 w-16 h-16 bg-indigo-600 rounded-full text-white shadow-2xl flex items-center justify-center hover:bg-indigo-700 hover:scale-110 active:scale-95 transition-all z-40 group"
+          className="fixed right-6 bottom-24 md:bottom-8 w-16 h-16 bg-indigo-600 rounded-full text-white shadow-2xl shadow-indigo-300 flex items-center justify-center hover:bg-indigo-700 hover:scale-110 active:scale-95 transition-all z-40 group"
+          style={{ bottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)' }} // Ajuste dinâmico para mobile
         >
           <Plus className="w-8 h-8 group-hover:rotate-90 transition-transform" />
         </button>
       )}
 
-      {/* Bottom Navigation for Mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 flex items-center justify-around px-2 py-3 z-50 rounded-t-[32px] shadow-2xl">
+      {/* Bottom Navigation for Mobile - Glassmorphism & Safe Area */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-100 flex items-center justify-around px-2 py-2 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
+           style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+      >
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setCurrentScreen(item.id)}
-            className={`flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-2xl transition-all ${
-              currentScreen === item.id ? 'text-indigo-600' : 'text-gray-400'
+            className={`flex flex-col items-center gap-1 w-full py-2 rounded-xl transition-all active:scale-95 ${
+              currentScreen === item.id ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-600'
             }`}
           >
-            <div className={`p-1.5 rounded-xl transition-all ${currentScreen === item.id ? 'bg-indigo-100 text-indigo-600 scale-110 shadow-sm' : ''}`}>
-              <item.icon className="w-5 h-5" />
+            <div className={`p-1 rounded-full transition-all ${currentScreen === item.id ? 'bg-indigo-100 scale-110' : ''}`}>
+              <item.icon className={`w-6 h-6 ${currentScreen === item.id ? 'stroke-[2.5px]' : 'stroke-2'}`} />
             </div>
-            <span className={`text-[10px] font-bold uppercase tracking-wider ${currentScreen === item.id ? 'opacity-100' : 'opacity-60'}`}>
+            <span className={`text-[10px] font-bold tracking-tight ${currentScreen === item.id ? 'opacity-100' : 'opacity-70'}`}>
               {item.label}
             </span>
           </button>

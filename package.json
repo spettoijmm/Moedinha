@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "main": "electron/main.js",
+  "homepage": ".", 
   "description": "Gerenciador Financeiro Pessoal com IA",
   "author": "Moedinha Team",
   "scripts": {
@@ -11,7 +12,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "electron:dev": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\"",
-    "electron:build": "tsc && vite build && electron-builder"
+    "electron:build": "tsc && vite build && electron-builder",
+    "deploy": "tsc && vite build && gh-pages -d dist"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -33,7 +35,8 @@
     "electron": "^29.1.0",
     "electron-builder": "^24.13.3",
     "concurrently": "^8.2.2",
-    "wait-on": "^7.2.0"
+    "wait-on": "^7.2.0",
+    "gh-pages": "^6.1.1"
   },
   "build": {
     "appId": "com.moedinha.app",
