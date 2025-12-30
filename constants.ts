@@ -1,5 +1,6 @@
+
 import { 
-  ChartPie, ShoppingBag, Coffee, Car, Home, DollarSign, Briefcase, 
+  PieChart, ShoppingBag, Coffee, Car, Home, DollarSign, Briefcase, 
   Zap, HeartPulse, GraduationCap, Wallet, Building2, TrendingUp, CircleDollarSign,
   ArrowRightLeft
 } from 'lucide-react';
@@ -22,7 +23,7 @@ export const CATEGORIES: CategoryItem[] = [
   
   // Both/Transfer
   { id: 'transfer', label: 'Transferência', icon: ArrowRightLeft, color: 'bg-gray-100 text-gray-600', type: 'both' },
-  { id: 'other', label: 'Outros', icon: ChartPie, color: 'bg-gray-100 text-gray-600', type: 'both' },
+  { id: 'other', label: 'Outros', icon: PieChart, color: 'bg-gray-100 text-gray-600', type: 'both' },
 ];
 
 export const ACCOUNT_TYPES = [

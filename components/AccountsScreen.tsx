@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { Plus, Wallet, ArrowLeft, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
 import { Account, Transaction } from '../types';
 import { transactionService } from '../services/transactionService';
 import { ACCOUNT_TYPES } from '../constants';
@@ -40,7 +41,6 @@ const AccountsScreen: React.FC = () => {
 
   // Logic for Detailed View
   if (selectedAccount) {
-      // Re-fetch latest balance just in case
       const currentAccountData = accounts.find(a => a.id === selectedAccount.id) || selectedAccount;
       
       const accountTransactions = transactions

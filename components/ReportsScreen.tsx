@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, Loader2 } from 'lucide-react';
 import { Transaction } from '../types';
 import { transactionService } from '../services/transactionService';
 import { getFinancialAdvice } from '../services/geminiService';
@@ -11,11 +12,9 @@ const ReportsScreen: React.FC = () => {
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   
-  // Filter State
   const [periodType, setPeriodType] = useState<Period>('month');
-  const [currentDate, setCurrentDate] = useState(new Date()); // Represents the anchor of the period
+  const [currentDate, setCurrentDate] = useState(new Date()); 
   
-  // AI
   const [aiReport, setAiReport] = useState('');
   const [loadingAi, setLoadingAi] = useState(false);
 
@@ -36,7 +35,6 @@ const ReportsScreen: React.FC = () => {
           end.setMonth(end.getMonth() + 1);
           end.setDate(0);
       } else if (periodType === 'semester') {
-          // Identify semester 1 or 2
           const currentMonth = start.getMonth();
           if (currentMonth < 6) {
               start.setMonth(0, 1);
@@ -50,7 +48,6 @@ const ReportsScreen: React.FC = () => {
           end.setMonth(11, 31);
       }
 
-      // Reset hours
       start.setHours(0,0,0,0);
       end.setHours(23,59,59,999);
 
@@ -60,7 +57,7 @@ const ReportsScreen: React.FC = () => {
       });
 
       setFilteredTransactions(filtered);
-      setAiReport(''); // Clear old report when filter changes
+      setAiReport(''); 
   };
 
   const handleNav = (direction: 'prev' | 'next') => {
@@ -91,10 +88,9 @@ const ReportsScreen: React.FC = () => {
       return '';
   };
 
-  // Chart Prep
   const chartData = filteredTransactions.reduce((acc, curr) => {
-      const dateKey = new Date(curr.date).getDate().toString(); // simplify to day for now
-      const existing = acc.find(a => a.name === dateKey);
+      const dateKey = new Date(curr.date).getDate().toString();
+      const existing = acc.find((a: any) => a.name === dateKey);
       if (existing) {
           if (curr.type === 'expense') existing.expense += curr.amount;
           else if (curr.type === 'income') existing.income += curr.amount;
@@ -121,10 +117,8 @@ const ReportsScreen: React.FC = () => {
            <p className="text-gray-500 text-sm">Passado e Futuro</p>
       </header>
 
-      {/* Controls */}
       <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between mb-6">
           <button onClick={() => handleNav('prev')} className="p-2 hover:bg-gray-100 rounded-full"><ChevronLeft className="w-5 h-5 text-gray-600" /></button>
-          
           <div className="flex flex-col items-center">
               <span className="font-bold text-gray-800 capitalize">{getPeriodLabel()}</span>
               <div className="flex gap-2 mt-1">
@@ -139,11 +133,9 @@ const ReportsScreen: React.FC = () => {
                   ))}
               </div>
           </div>
-
           <button onClick={() => handleNav('next')} className="p-2 hover:bg-gray-100 rounded-full"><ChevronRight className="w-5 h-5 text-gray-600" /></button>
       </div>
 
-      {/* Summary Stats */}
       <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
               <p className="text-xs text-emerald-600 font-bold uppercase">Entradas</p>
@@ -155,7 +147,6 @@ const ReportsScreen: React.FC = () => {
           </div>
       </div>
 
-      {/* Chart */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 h-64 mb-6">
           <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
@@ -167,7 +158,6 @@ const ReportsScreen: React.FC = () => {
           </ResponsiveContainer>
       </div>
 
-      {/* AI Report Section */}
       <div className="space-y-4">
           <button 
             onClick={generateReport}

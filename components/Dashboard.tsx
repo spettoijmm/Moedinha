@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis } from 'recharts';
 import { Transaction, Budget } from '../types';
 import { transactionService } from '../services/transactionService';
 import SummaryCards from './SummaryCards';
 import TransactionList from './TransactionList';
-import { Sparkles, Loader2, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Sparkles, Loader2, AlertTriangle } from 'lucide-react';
 import { getFinancialAdvice } from '../services/geminiService';
 
 const Dashboard: React.FC = () => {
@@ -62,7 +63,6 @@ const Dashboard: React.FC = () => {
         </button>
       </header>
       
-      {/* Alerta de Orçamento Excedido */}
       {budgetAlerts.length > 0 && (
         <div className="bg-red-50 border border-red-100 p-4 rounded-[20px] mb-6 flex items-start gap-3 shadow-sm animate-scale-in">
              <div className="bg-red-100 text-red-600 p-2 rounded-full shrink-0">
@@ -108,7 +108,7 @@ const Dashboard: React.FC = () => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {expensesByCategory.map((entry, index) => (
+                    {expensesByCategory.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
-  ChartPie, ShoppingBag, Coffee, Car, Home, DollarSign, Briefcase, 
-  Zap, HeartPulse, GraduationCap, Wallet, Building2, TrendingUp, CircleDollarSign,
+  PieChart, ShoppingBag, Coffee, Car, Home, DollarSign, Briefcase, 
+  Zap, HeartPulse, GraduationCap,
   ArrowRightLeft, Plus, X, ArrowLeft, Star, Trash2
 } from 'lucide-react';
 import { CategoryItem, Transaction } from '../types';
@@ -12,18 +13,16 @@ import TransactionList from './TransactionList';
 const ICON_MAP: Record<string, any> = {
     food: Coffee, shopping: ShoppingBag, transport: Car, housing: Home,
     utilities: Zap, health: HeartPulse, education: GraduationCap,
-    salary: DollarSign, freelance: Briefcase, investment_return: TrendingUp,
-    transfer: ArrowRightLeft, other: ChartPie, star: Star
+    salary: DollarSign, freelance: Briefcase, investment_return: ArrowRightLeft,
+    transfer: ArrowRightLeft, other: PieChart, star: Star
 };
 
 const CategoriesScreen: React.FC = () => {
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   
-  // Drill Down State
   const [selectedCategory, setSelectedCategory] = useState<CategoryItem | null>(null);
 
-  // Creation State
   const [isCreating, setIsCreating] = useState(false);
   const [newCatName, setNewCatName] = useState('');
   const [newCatType, setNewCatType] = useState<'income' | 'expense'>('expense');
@@ -47,7 +46,7 @@ const CategoriesScreen: React.FC = () => {
       transactionService.addCategory({
           label: newCatName,
           type: newCatType,
-          iconName: 'star', // Default icon for custom
+          iconName: 'star', 
           color: newCatColor
       });
       setIsCreating(false);
@@ -61,16 +60,13 @@ const CategoriesScreen: React.FC = () => {
       }
   }
 
-  // Drill Down View
   if (selectedCategory) {
       const filteredTx = transactions
         .filter(t => t.category === selectedCategory.id)
         .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       const total = filteredTx.reduce((sum, t) => sum + t.amount, 0);
-
-      // Fix: Check if iconName exists before lookup
-      const Icon = (selectedCategory.iconName && ICON_MAP[selectedCategory.iconName]) || ChartPie;
+      const Icon = (selectedCategory.iconName && ICON_MAP[selectedCategory.iconName]) || PieChart;
 
       return (
           <div className="p-6 pb-24 h-full flex flex-col animate-fade-in">
@@ -102,7 +98,6 @@ const CategoriesScreen: React.FC = () => {
       )
   }
 
-  // Main Grid View
   const expenseCats = categories.filter(c => c.type === 'expense');
   const incomeCats = categories.filter(c => c.type === 'income');
   const otherCats = categories.filter(c => c.type === 'both');
@@ -110,8 +105,7 @@ const CategoriesScreen: React.FC = () => {
   const renderGrid = (cats: CategoryItem[]) => (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {cats.map(cat => {
-            // Fix: Check if iconName exists before lookup
-            const Icon = (cat.iconName && ICON_MAP[cat.iconName]) || ChartPie;
+            const Icon = (cat.iconName && ICON_MAP[cat.iconName]) || PieChart;
             return (
                 <div 
                     key={cat.id} 
@@ -168,23 +162,9 @@ const CategoriesScreen: React.FC = () => {
                       />
                       <div className="flex bg-gray-100 p-1 rounded-xl">
                           <button type="button" onClick={() => setNewCatType('expense')} className={`flex-1 py-2 rounded-lg text-sm font-bold ${newCatType === 'expense' ? 'bg-white text-red-500 shadow-sm' : 'text-gray-500'}`}>Despesa</button>
+                          {/* // Fix: Corrected the function name from setNewType to setNewCatType as defined in the component's state. */}
                           <button type="button" onClick={() => setNewCatType('income')} className={`flex-1 py-2 rounded-lg text-sm font-bold ${newCatType === 'income' ? 'bg-white text-emerald-500 shadow-sm' : 'text-gray-500'}`}>Receita</button>
                       </div>
-                      
-                      <div>
-                          <p className="text-xs font-bold text-gray-400 uppercase mb-2">Cor</p>
-                          <div className="flex gap-2">
-                              {['bg-red-100 text-red-600', 'bg-blue-100 text-blue-600', 'bg-green-100 text-green-600', 'bg-purple-100 text-purple-600', 'bg-orange-100 text-orange-600'].map(c => (
-                                  <button 
-                                    key={c}
-                                    type="button"
-                                    onClick={() => setNewCatColor(c)}
-                                    className={`w-8 h-8 rounded-full ${c.split(' ')[0]} border-2 ${newCatColor === c ? 'border-gray-400' : 'border-transparent'}`}
-                                  />
-                              ))}
-                          </div>
-                      </div>
-
                       <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold">Criar</button>
                   </form>
               </div>

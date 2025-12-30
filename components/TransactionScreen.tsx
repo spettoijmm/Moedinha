@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Transaction } from '../types';
 import { transactionService } from '../services/transactionService';
 import TransactionList from './TransactionList';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type Period = 'month' | 'biweekly' | 'semester' | 'year';
 
@@ -11,12 +12,10 @@ const TransactionScreen: React.FC = () => {
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState<'income' | 'expense'>('expense');
   
-  // Filter State
   const [periodType, setPeriodType] = useState<Period>('month');
   const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
-    // Initial fetch
     setAllTransactions(transactionService.getTransactions());
     const unsubscribe = transactionService.subscribe(() => {
         setAllTransactions(transactionService.getTransactions());
@@ -76,7 +75,6 @@ const TransactionScreen: React.FC = () => {
       if (periodType === 'month') {
           newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
       } else if (periodType === 'biweekly') {
-          // Logic for biweekly nav
           const day = newDate.getDate();
           if (direction === 'next') {
               if (day <= 15) newDate.setDate(16);
@@ -120,7 +118,6 @@ const TransactionScreen: React.FC = () => {
            <p className="text-gray-500 text-sm">Histórico de movimentações</p>
       </header>
 
-      {/* Date Filter Controls */}
       <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 mb-4">
           <div className="flex items-center justify-between">
             <button onClick={() => handleNav('prev')} className="p-2 hover:bg-gray-100 rounded-full"><ChevronLeft className="w-5 h-5 text-gray-600" /></button>
@@ -130,35 +127,17 @@ const TransactionScreen: React.FC = () => {
           
           <div className="flex gap-1 justify-center pb-1 overflow-x-auto">
               {(['month', 'biweekly', 'semester', 'year'] as Period[]).map(p => (
-                  <button 
-                    key={p} 
-                    onClick={() => setPeriodType(p)}
-                    className={`text-[10px] px-3 py-1 rounded-full uppercase font-bold transition-all whitespace-nowrap ${periodType === p ? 'bg-indigo-100 text-indigo-700' : 'text-gray-400 bg-gray-50'}`}
-                  >
-                      {p === 'month' ? 'Mês' : p === 'biweekly' ? 'Quinz.' : p === 'semester' ? 'Sem.' : 'Ano'}
-                  </button>
+                  <button key={p} onClick={() => setPeriodType(p)} className={`text-[10px] px-3 py-1 rounded-full uppercase font-bold transition-all whitespace-nowrap ${periodType === p ? 'bg-indigo-100 text-indigo-700' : 'text-gray-400 bg-gray-50'}`}>{p === 'month' ? 'Mês' : p === 'biweekly' ? 'Quinz.' : p === 'semester' ? 'Sem.' : 'Ano'}</button>
               ))}
           </div>
       </div>
 
       <div className="flex bg-gray-200 p-1 rounded-xl mb-6 shrink-0">
-          <button
-            onClick={() => setActiveTab('income')}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'income' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500'}`}
-          >
-              Receitas
-          </button>
-          <button
-            onClick={() => setActiveTab('expense')}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'expense' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500'}`}
-          >
-              Despesas
-          </button>
+          <button onClick={() => setActiveTab('income')} className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'income' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500'}`}>Receitas</button>
+          <button onClick={() => setActiveTab('expense')} className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'expense' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500'}`}>Despesas</button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-         <TransactionList transactions={filteredTransactions} />
-      </div>
+      <div className="flex-1 overflow-y-auto"><TransactionList transactions={filteredTransactions} /></div>
     </div>
   );
 };

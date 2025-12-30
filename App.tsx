@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Home, Wallet, PieChart, ListPlus, Plus, LogOut, User as UserIcon, Settings, RefreshCw, ChevronRight } from 'lucide-react';
+
+import React, { useState } from 'react';
+import { Home, Wallet, PieChart, ListPlus, Plus, LogOut, User as UserIcon, RefreshCw } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import TransactionScreen from './components/TransactionScreen';
 import FinanceSettingsScreen from './components/FinanceSettingsScreen';
@@ -41,7 +42,7 @@ const App: React.FC = () => {
   const navItems = [
     { id: 'dashboard' as const, label: 'Início', icon: Home },
     { id: 'transactions' as const, label: 'Extrato', icon: ListPlus },
-    { id: 'financeSettings' as const, label: 'Contas', icon: Wallet }, // Funciona como 'Configurações de Conta'
+    { id: 'financeSettings' as const, label: 'Contas', icon: Wallet }, 
     { id: 'planning' as const, label: 'Planos', icon: PieChart },
     { id: 'profile' as const, label: 'Perfil', icon: UserIcon },
   ];
@@ -96,13 +97,13 @@ const App: React.FC = () => {
         <button
           onClick={() => setIsFormOpen(true)}
           className="fixed right-6 bottom-24 md:bottom-8 w-16 h-16 bg-indigo-600 rounded-full text-white shadow-2xl shadow-indigo-300 flex items-center justify-center hover:bg-indigo-700 hover:scale-110 active:scale-95 transition-all z-40 group"
-          style={{ bottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)' }} // Ajuste dinâmico para mobile
+          style={{ bottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)' }} 
         >
           <Plus className="w-8 h-8 group-hover:rotate-90 transition-transform" />
         </button>
       )}
 
-      {/* Bottom Navigation for Mobile - Glassmorphism & Safe Area */}
+      {/* Bottom Navigation for Mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-100 flex items-center justify-around px-2 py-2 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
            style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
       >

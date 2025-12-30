@@ -1,4 +1,5 @@
-import { Transaction, Account, Budget, UserProfile, TransactionType, RecurrenceFrequency, CategoryItem } from '../types';
+
+import { Transaction, Account, Budget, UserProfile, RecurrenceFrequency, CategoryItem } from '../types';
 import { FREQUENCIES, CATEGORIES as DEFAULT_CATEGORIES } from '../constants';
 
 const STORAGE_KEY_TRANSACTIONS = 'finance_flow_transactions';
@@ -17,10 +18,6 @@ class TransactionService {
   }
 
   private initializeDefaults() {
-    if (!localStorage.getItem(STORAGE_KEY_USER)) {
-       // Wait for registration
-    }
-    // Init Categories if empty
     if (!localStorage.getItem(STORAGE_KEY_CATEGORIES)) {
         const initialCats = DEFAULT_CATEGORIES.map(c => ({
             ...c,
@@ -42,7 +39,6 @@ class TransactionService {
     this.listeners.forEach(listener => listener());
   }
 
-  // --- Sync / Backup ---
   exportData(): string {
       const data = {
           transactions: this.getTransactions(),
@@ -74,7 +70,6 @@ class TransactionService {
       }
   }
 
-  // --- Auth & User ---
   getUser(): UserProfile | null {
     const raw = localStorage.getItem(STORAGE_KEY_USER);
     return raw ? JSON.parse(raw) : null;
@@ -110,7 +105,6 @@ class TransactionService {
 
   logout(): void {}
 
-  // --- Categories ---
   getCategories(): CategoryItem[] {
       const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
       return raw ? JSON.parse(raw) : [];
@@ -134,8 +128,6 @@ class TransactionService {
       this.notifyListeners();
   }
 
-  // --- Transactions ---
-
   getTransactions(): Transaction[] {
     const raw = localStorage.getItem(STORAGE_KEY_TRANSACTIONS);
     return raw ? JSON.parse(raw) : [];
@@ -154,7 +146,6 @@ class TransactionService {
     const parentId = crypto.randomUUID();
 
     if (!recurrenceSettings) {
-        // Single transaction
         newTransactions.push({
             ...transaction,
             id: crypto.randomUUID(),
@@ -164,12 +155,10 @@ class TransactionService {
         const iterations = isInfinite ? 24 : (count || 1); 
         const freqInfo = FREQUENCIES.find(f => f.id === frequency) || FREQUENCIES[2]; 
         const baseDate = new Date(transaction.date);
-        
         const amountPerTx = isInfinite ? transaction.amount : (transaction.amount / iterations);
 
         for (let i = 0; i < iterations; i++) {
             const date = new Date(baseDate);
-            
             if (frequency === 'monthly') date.setMonth(baseDate.getMonth() + i);
             else if (frequency === 'yearly') date.setFullYear(baseDate.getFullYear() + i);
             else if (frequency === 'semiannual') date.setMonth(baseDate.getMonth() + (i * 6));
@@ -201,7 +190,6 @@ class TransactionService {
 
   addTransfer(fromAccountId: string, toAccountId: string, amount: number, date: string, title: string) {
       const current = this.getTransactions();
-      
       const tOut: Transaction = {
         id: crypto.randomUUID(),
         title: `Envio: ${title}`,
@@ -211,7 +199,6 @@ class TransactionService {
         category: 'transfer',
         accountId: fromAccountId
       };
-
       const tIn: Transaction = {
         id: crypto.randomUUID(),
         title: `Recebimento: ${title}`,
@@ -221,7 +208,6 @@ class TransactionService {
         category: 'transfer',
         accountId: toAccountId
       };
-
       const updated = [tOut, tIn, ...current];
       localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(updated));
       this.notifyListeners();
@@ -233,8 +219,6 @@ class TransactionService {
     localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(updated));
     this.notifyListeners();
   }
-
-  // --- Accounts ---
 
   getAccounts(): Account[] {
     const raw = localStorage.getItem(STORAGE_KEY_ACCOUNTS);
@@ -260,12 +244,6 @@ class TransactionService {
     this.notifyListeners();
   }
 
-  getAccountById(id: string): Account | undefined {
-      return this.getAccounts().find(a => a.id === id);
-  }
-
-  // --- Budgets ---
-
   getBudgets(): Budget[] {
     const raw = localStorage.getItem(STORAGE_KEY_BUDGETS);
     return raw ? JSON.parse(raw) : [];
@@ -274,7 +252,6 @@ class TransactionService {
   setBudget(budget: Budget): void {
     const current = this.getBudgets();
     const existingIndex = current.findIndex(b => b.id === budget.id);
-    
     let updated;
     if (existingIndex >= 0) {
       updated = [...current];
@@ -282,7 +259,6 @@ class TransactionService {
     } else {
       updated = [...current, budget];
     }
-    
     localStorage.setItem(STORAGE_KEY_BUDGETS, JSON.stringify(updated));
     this.notifyListeners();
   }
