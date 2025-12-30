@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "electron:dev": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\"",
     "electron:build": "tsc && vite build && electron-builder",
-    "deploy": "tsc && vite build && gh-pages -d dist"
+    "deploy": "tsc && vite build && gh-pages -d dist",
+    "streamlit": "streamlit run streamlit_app.py"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -32,6 +33,7 @@
     "typescript": "^5.2.2",
     "vite": "^5.1.6",
     "vite-plugin-pwa": "^0.19.2",
+    "vite-plugin-singlefile": "^2.0.1",
     "electron": "^29.1.0",
     "electron-builder": "^24.13.3",
     "concurrently": "^8.2.2",
